@@ -1,0 +1,221 @@
+﻿<html>
+<head>
+        
+    @Html.Partial("../Shared/_Layout.cshtml")
+
+</head>
+
+<body class="text-center">
+    <div class="background_image"></div>
+    <div class="cover-container d-flex  p-0 pt-3  flex-column ">
+
+        @Html.Partial("../Shared/_Navigation.cshtml")
+
+            
+        <main role="main" class="mt-5 d-flex flex-column wrapper" style="margin-top: calc(15vh)!important;">
+
+                
+            <h3 class="pt-4 pb-2" id="book_title"></h3>
+            <h4 class="pt-0 pb-4" id="book_author"></h4>
+
+            <form class="m-auto w-75">
+                <div class="form-group col-6 m-0 float-left">
+                    <label for="book_isbn">ISBN</label>
+                    <input type="text" class="form-control" id="book_isbn" readonly value="">
+                </div>
+                <div class="form-group col-6 float-left">
+                    <label for="book_year">Year</label>
+                    <input type="text" class="form-control" id="book_year" readonly value="">
+                </div>
+                <div class="form-group col-6 float-left">
+                    <label for="book_copies">Number of copies</label>
+                    <input type="text" class="form-control" id="book_copies" value="">
+                </div>
+                <div class="form-group col-6 float-left">
+                    <label for="book_price">Price</label>
+                    <input type="text" class="form-control" id="book_price" value="">
+                </div>
+                <div class="form-group col-6 float-left">
+                    <label for="book_call_number">Item call number</label>
+                    <input type="text" class="form-control" id="book_call_number" value="">
+                </div>
+                <div class="form-group col-6 float-left">
+                    <label for="book_publisher">Publisher code</label>
+                    <input type="text" class="form-control" id="book_publisher" value=''>
+                </div>
+                <div class="form-group col-12 float-left ">
+                    <div class="col-12 m-auto p-0">
+                        <label for="book_edition">Edition statement</label>
+                        <textarea class="form-control" height="4" id="book_edition"></textarea>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button type="button" class="btn btn-danger d-block m-2 float-left pl-5 pr-5 mb-3" onclick="book.bl.delete_book();">Delete</button>
+                    <button type="button" class="btn btn-secondary d-block m-2 float-right pl-5 pr-5 mb-3" onclick="book.bl.save_book();">Save</button>
+                    <button type="button" class="btn btn-secondary d-block m-2 float-right pl-5 pr-5 mb-3" onclick="book.bl.loan_book();">Loan</button>
+                </div>
+
+
+            </form>
+                
+        </main>
+
+            
+
+    </div>
+</body>
+
+<script>
+
+    let book = {}
+
+    book.bl = new function() {
+
+        this.delete_book = async () => {
+
+            let id = js.page.get_id();
+
+            let query = `
+                    mutation {
+                      deleteBook(id: ${id})
+                    }`
+
+            
+
+            let res = await js.api.graphql(query);
+
+            console.log(res["data"]["deleteBook"]);
+
+            window.location.replace("/graph/allbooks");
+
+            if(res["data"]["deleteBook"] == 200) {
+                alert("Book successfully removed!");
+            } else {
+                alert("Error deleting the book!");
+            }
+
+        }
+
+        this.save_book = async () => {
+            
+            let id = js.page.get_id();
+
+            let number_of_copies = book_copies.value;
+            let price = book_price.value;
+            let item_call_number = book_call_number.value;
+            let publisher_code = book_publisher.value;
+            let edition_statement = book_edition.value;
+
+
+            let query = `
+                mutation {
+                  updateBook(input: {id: ${id}, edition_statement: "${edition_statement}", price: "${price}",
+                  item_call_number: "${item_call_number}", publisher_code: "${publisher_code}", number_of_copies: "${number_of_copies}"}) {
+                    book {
+                      id,
+                      title,
+                      year,
+                      authorId
+                    }
+                  }
+                }
+            `;
+
+            await js.api.graphql(query);
+
+        }
+
+        this.loan_book = async () => {
+
+            if(!sessionStorage.getItem("user_id")) {
+                alert("You must be logged in to loan books!")
+                //window.location.href = "/home/login";
+                return;
+            } 
+
+            let user_id = sessionStorage.getItem("user_id");
+
+            let book_id = js.page.get_id();
+
+            let query = `
+                    mutation {
+                      addLoan(input: {user_id: ${user_id}, book_id: ${book_id}}) {
+                        loan {
+                          id
+                        }
+                      }
+                    }
+            `;
+
+            let res = await js.api.graphql(query);
+
+            alert("Book successfuly loaned!");
+            window.location.href = "/graph/allbooks";
+            
+        }
+
+        this.load_book = async () => {
+
+            let id = js.page.get_id();
+
+            const query = `
+                    query {
+                        book (
+                        where: {id: {eq: ${id}}}
+                        ){
+                            nodes {
+                                id,
+                                title,
+                                year,
+                                isbn,
+                                number_of_copies,
+                                item_call_number
+                                price,
+                                publisher_code,
+                                edition_statement,
+                                author{
+                                    id,
+                                    name
+                                }
+                            }
+                        }
+                    }
+                `;
+
+            let res = await fetch("https://localhost:7088/graphql", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                body: JSON.stringify({
+                    query
+                })
+            })
+
+            let json = await res.json();
+
+            let data = json["data"]["book"]["nodes"];
+         
+            console.log("D",data)
+
+            book_title.innerText = data[0]['title'];
+            book_author.innerText = data[0]['author']['name'];
+
+            book_isbn.value = data[0]['isbn'];
+            book_year.value = data[0]['year'];
+            book_copies.value = data[0]['number_of_copies'];
+            book_price.value = data[0]['price'];
+            book_call_number.value = data[0]['item_call_number'];
+            book_publisher.value = data[0]['publisher_code'];
+            book_edition.innerText = data[0]['edition_statement'];
+
+        }
+
+    }
+
+    document.onload(book.bl.load_book());
+
+</script>
+
+</html>

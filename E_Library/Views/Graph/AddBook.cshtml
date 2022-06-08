@@ -1,0 +1,118 @@
+﻿
+<html>
+<head>
+        
+    @Html.Partial("../Shared/_Layout.cshtml")
+
+</head>
+
+<body class="text-center">
+    <div class="background_image"></div>
+    <div class="cover-container d-flex  p-0 pt-3  flex-column ">
+
+        @Html.Partial("../Shared/_Navigation.cshtml")
+
+            
+        <main role="main" class="mt-5 d-flex flex-column wrapper" style="margin-top: calc(15vh)!important;">
+
+                
+            <h3 class=" pt-4 pb-2">Add a new book</h3>
+
+            <form class="m-auto w-75">
+                <div class="form-group col-6 m-0 float-left">
+                    <label for="add_book_title">Title</label>
+                    <input type="text" class="form-control" id="add_book_title">
+                </div>
+                <div class="form-group col-6 m-0 float-left">
+                    <label for="add_book_isbn">ISBN</label>
+                    <input type="text" class="form-control" id="add_book_isbn">
+                </div>
+                <div class="form-group col-6 float-left">
+                    <label for="add_book_year">Year</label>
+                    <input type="text" class="form-control" id="add_book_year">
+                </div>
+                <div class="form-group col-6 float-left">
+                    <label for="add_book_number_of_copies">Number of copies</label>
+                    <input type="text" class="form-control" id="add_book_number_of_copies">
+                </div>
+                <div class="form-group col-6 float-left">
+                    <label for="add_book_price">Price</label>
+                    <input type="text" class="form-control" id="add_book_price">
+                </div>
+                <div class="form-group col-6 float-left">
+                    <label for="add_book_item_call_number">Item call number   </label>
+                    <input type="text" class="form-control" id="add_book_item_call_number">
+                </div>
+                <div class="form-group col-6 float-left">
+                    <label for="add_book_publisher_code">Publisher code</label>
+                    <input type="text" class="form-control" id="add_book_publisher_code">
+                </div>
+                <div class="form-group col-12 float-left ">
+                    <div class="col-12 m-auto p-0">
+                        <label for="add_book_edition_statement">Edition statement</label>
+                        <textarea class="form-control" height="4" id="add_book_edition_statement"></textarea>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button type="button" class="btn btn-secondary d-block m-2 float-right pl-5 pr-5 mb-3" onclick="add_book.bl.add();">Save</button>
+                </div>
+                
+        </main>
+
+            
+
+    </div>
+</body>
+
+<script>
+
+    let add_book = {};
+
+    add_book.bl = new function() {
+
+        this.add = async () => {
+
+            let id = js.page.get_id();
+            
+            let data = {};
+
+            let title = add_book_title.value;
+            let year = add_book_year.value;
+            let isbn = add_book_isbn.value;
+            let number_of_copies = add_book_number_of_copies.value;
+            let price = add_book_price.value;
+            let item_call_number = add_book_item_call_number.value;
+            let publisher_code = add_book_publisher_code.value;
+            let edition_statement = add_book_edition_statement.value;
+            debugger;
+            const query = `
+                    mutation {
+                      addBook(input: {title: "${title}", year: "${year}", authorId: ${id}, isbn: "${isbn}",
+                        number_of_copies: "${number_of_copies}", price: "${price}", item_call_number: "${item_call_number}",
+                        publisher_code: "${publisher_code}", edition_statement: "${edition_statement}" }) {
+                        book {
+                          id,
+                          title,
+                          year,
+                          authorId,
+                          isbn,
+                          number_of_copies,
+                          price,
+                          item_call_number,
+                          publisher_code,
+                          edition_statement
+                        }
+                      }
+                    }
+                `; 
+
+            await js.api.graphql(query);
+
+        }
+
+    }
+
+
+</script>
+
+</html>

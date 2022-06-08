@@ -1,0 +1,149 @@
+﻿<html>
+    <head>
+        
+        @Html.Partial("../Shared/_Layout.cshtml")
+
+    </head>
+
+    <body class="text-center">
+        <div class="background_image"></div>
+        <div class="cover-container d-flex  p-0 pt-3  flex-column">
+
+            @Html.Partial("../Shared/_Navigation.cshtml")
+
+            
+            <main role="main" class="mt-5 d-flex flex-column wrapper">
+
+                
+                <h2 class=" pl-5 pt-4 pb-4" style="">Top GraphQl books</h2>
+                
+                <table class="table mt-5 pt-5 w-75 border m-auto" style="color:black" >
+                <thead>
+                <tr>
+                    <th scope="col" >#</th>
+                    <th scope="col" class="w-25">Title</th>
+                    <th scope="col" class="w-25">Author</th>
+                    <th scope="col" >Year</th>
+                    <th scope="col" style="max-width:250px!important">ISBN</th>
+                </tr>
+                </thead>
+                <tbody id="books_table_body">
+                   
+                </tbody>
+                </table>
+            </main>
+
+            
+
+        </div>
+    </body>
+
+<template id="books_row_template">
+
+    <tr class="book_row" onclick='window.location.href = "/graph/book/${id}"'>
+        <td >${i}</td>
+        <td>${title}</td>
+        <td><a href="/graph/authorbooks/${author_id}">${name}</a></td>
+        <td>${year}</td>
+        <td style="max-width:250px!important">${isbn}</td>
+    </tr>
+
+</template>
+
+<script>
+
+    let books = {};
+
+    books.bl = new function() {
+
+        this.book_details = (id) => {
+
+            window.location.href = "/rest/book/" + id;
+
+        }
+
+        this.load_books = async () => {
+
+            const query = `
+                   query {
+                      book (first: 1000, order: {id: ASC}) {
+                        nodes {
+                          id,
+                          title,
+                          year,
+                          isbn,
+                          author {
+                            id,
+                            name
+                          }
+                        }
+                      }
+                    }
+                `;
+
+            //let res = await fetch("https://localhost:7088/graphql", {
+            //    method: "POST",
+            //    headers: {
+            //        "Content-Type": "application/json",
+            //        "Accept": "application/json",
+            //    },
+            //    body: JSON.stringify({
+            //        query
+            //    })
+            //})
+
+            //let json = await res.json();
+
+            let json = await js.api.graphql(query);
+
+            let data = json["data"]["book"]["nodes"];
+         
+            console.log("D",data)
+
+            let html = books_table_body.innerHTML;
+
+            html = '';
+
+            
+            let i = 0;
+            for(d of data) {
+
+                var t = books_row_template.innerHTML;
+                i++;
+
+                if(d['author']) {
+                    t = t.replace("${id}", d['id']);
+                    t = t.replace("${i}", i);
+                    t = t.replace("${title}", d['title']);
+                    t = t.replace("${author_id}", d['author']['id'] || "null");
+                    t = t.replace("${name}", d['author']['name'] || "Author unknown");
+                    t = t.replace("${year}", d['year']);
+                    t = t.replace("${isbn}", d['isbn']);
+                } else {
+                    t = t.replace("${id}", d['id']);
+                    t = t.replace("${i}", i);
+                    t = t.replace("${title}", d['title']);
+                    t = t.replace("${author_id}", "0");
+                    t = t.replace("${name}", "Author unknown");
+                    t = t.replace("${year}", d['year']);
+                    t = t.replace("${isbn}", d['isbn']);
+                }
+
+
+
+               
+
+                books_table_body.insertAdjacentHTML("beforeend", t);
+
+            }
+
+
+        }
+
+    }
+
+    document.onload(books.bl.load_books());
+
+</script>
+
+</html>

@@ -1,0 +1,251 @@
+﻿@{
+    var books = bl.books.list_all();
+    Console.WriteLine(books);
+}
+
+
+<html>
+<head>
+        
+    @Html.Partial("../Shared/_Layout.cshtml")
+
+</head>
+
+<body class="text-center">
+    <div class="background_image"></div>
+    <div class="cover-container d-flex  p-0 pt-3  flex-column">
+
+        @Html.Partial("../Shared/_Navigation.cshtml")
+
+            
+        <main role="main" class="mt-5 d-flex flex-column wrapper justify-content-center">
+
+                
+            <h2 class=" pl-5 pt-4 pb-4" style="" id="user_h2"></h2>
+            <h2 class=" pl-5 pt-4 pb-4" style="">Loans</h2>
+
+            <div class="d-flex justify-content-between w-75 m-auto pb-3">
+                <div>
+                    <button class="btn btn-secondary float-right pl-3 pr-3 mr-4" onclick=user.rest.load()>REST</button>
+                    <button class="btn btn-secondary float-right pl-3 pr-3 mr-4" onclick=user.graphql.load()>GraphQL</button>
+                    <button class="btn btn-secondary float-right pl-3 pr-3 mr-4" onclick=user.bl.clear()>Clear</button>
+                </div>
+                <button class="btn btn-danger float-right pl-3 pr-3 " onclick=user.bl.log_out()>Log out</button>
+                
+            </div>
+
+            <table class="table mt-5 pt-5 w-75 border m-auto" style="color:black" >
+            <thead>
+            <tr>
+                <th scope="col" >#</th>
+                <th scope="col" class="w-25">Title</th>
+                <th scope="col" class="w-25">Author</th>
+                <th scope="col" >Year</th>
+                <th scope="col" style="max-width:250px!important">ISBN</th>
+                <th scope="col" ></th>
+            </tr>
+            </thead>
+            <tbody id="books_table_body">
+                   
+            </tbody>
+            </table>
+        </main>
+
+            
+
+    </div>
+</body>
+
+<template id="books_row_template_rest">
+
+    <tr class="book_row" onclick='window.location.href = "/rest/book/${book_id}"'>
+        <td >${i}</td>
+        <td>${title}</td>
+        <td><a href="/rest/authorbooks/${author_id}">${name}</a></td>
+        <td>${year}</td>
+        <td style="max-width:250px!important">${isbn}</td>
+        <td style=""><button class="btn btn-secondary" onclick="user.rest.return_book(${id})">Return</button></td>
+    </tr>
+
+</template>
+
+<template id="books_row_template_graphql">
+
+    <tr class="book_row" onclick='window.location.href = "/graph/book/${book_id}"'>
+        <td >${i}</td>
+        <td>${title}</td>
+        <td><a href="/graph/authorbooks/${author_id}">${name}</a></td>
+        <td>${year}</td>
+        <td style="max-width:250px!important">${isbn}</td>
+        <td style=""><button class="btn btn-secondary" onclick="user.graphql.return_book(${id})">Return</button></td>
+    </tr>
+
+</template>
+
+<script>
+
+    let user = {};
+
+    user.bl = new function() {
+
+        this.log_out = () => {
+            sessionStorage.clear();
+            window.location.href = "/home/login";
+        }
+
+        this.clear = () => {
+            books_table_body.innerHTML = '';
+        }
+
+    }
+
+    user.graphql = new function() {
+
+        this.return_book = async (id) => {
+
+            if (!e) var e = window.event;
+            e.cancelBubble = true;
+            if (e.stopPropagation) e.stopPropagation();
+
+            let query = `
+                mutation {
+                  deleteLoan(id: ${id})
+                }
+            `;
+
+            let res = await js.api.graphql(query);
+
+            if(res["data"]["deleteLoan"] == 200) {
+                alert("Book successfully returned!");
+                location.reload();
+            } else {
+                alert("Error returning the book!");
+            }
+
+        }
+
+        this.load = async () => {
+
+            if(!sessionStorage.getItem("user_id")) {
+                window.location.href = "/home/login";
+                return;
+            } 
+
+            user_h2.innerText = sessionStorage.getItem("username");
+
+            let id = sessionStorage.getItem("user_id");
+
+            let query = `query {
+                          book (where: {loan: {user_id: {eq: ${id}}}}, first: 100) {
+                            nodes {
+                              id,
+                              title,
+                              year,
+                              isbn,
+                              author {
+                                id,
+                                name
+                              },
+                              loan {
+                                id
+                              }
+                            }
+                          }
+                        }`;
+
+            
+
+            let json = await js.api.graphql(query)
+            
+
+            let data = json["data"]["book"]["nodes"];
+
+            console.log(data);
+            books_table_body.innerHTML = '';
+
+            //debugger;
+            let i = 0;
+            for(d of data) {
+
+                var t = books_row_template_graphql.innerHTML;
+                i++;
+
+                t = t.replaceAll("${id}", d['loan']['id']);
+                t = t.replaceAll("${book_id}", d['id']);
+                t = t.replace("${i}", i);
+                t = t.replace("${title}", d['title']);
+                t = t.replace("${author_id}", d['author']['id']);
+                t = t.replace("${name}", d['author']['name']);
+                t = t.replace("${year}", d['year']);
+                t = t.replace("${isbn}", d['isbn']);
+
+                books_table_body.insertAdjacentHTML("beforeend", t);
+
+            }
+
+        }
+    }
+
+    user.rest = new function() {
+
+        this.load = async () => {
+
+            if(!sessionStorage.getItem("user_id")) {
+                window.location.href = "/home/login";
+                return;
+            } 
+
+            user_h2.innerText = sessionStorage.getItem("username");
+
+            let url = "/api/loans/get?id=" + sessionStorage.getItem("user_id");
+
+            let data = await js.api.get_json(url);
+            console.log(data)
+                
+            books_table_body.innerHTML = '';
+
+            
+            let i = 0;
+            for(d of data) {
+
+                var t = books_row_template_rest.innerHTML;
+                i++;
+
+                t = t.replaceAll("${id}", d['id']);
+                t = t.replaceAll("${book_id}", d['book_id']);
+                t = t.replace("${i}", i);
+                t = t.replace("${title}", d['title']);
+                t = t.replace("${author_id}", d['authorId']);
+                t = t.replace("${name}", d['name']);
+                t = t.replace("${year}", d['year']);
+                t = t.replace("${isbn}", d['isbn']);
+
+                books_table_body.insertAdjacentHTML("beforeend", t);
+
+            }
+
+        }
+
+        this.return_book = async (id) => {
+
+            if (!e) var e = window.event;
+            e.cancelBubble = true;
+            if (e.stopPropagation) e.stopPropagation();
+
+
+            let url = "/api/loans/delete?id=" + id;
+
+            await js.api.get(url);
+
+            location.reload();
+            //console.log("RETURN");
+
+        }
+
+    }
+
+    document.onload(user.rest.load())
+
+</script>
+
+</html>

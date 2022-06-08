@@ -1,0 +1,88 @@
+﻿<html>
+    <head>
+        
+        @Html.Partial("../Shared/_Layout.cshtml")
+        <link rel="stylesheet" href="/css/cover.css" type="text/css" />
+
+    </head>
+
+    <body class="text-center">
+        <div class="background_image"></div>
+        <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+
+            @Html.Partial("../Shared/_Navigation.cshtml")
+
+            <main role="main" class="inner cover">
+                <h1 class="cover-heading">eLibrary</h1>
+                <form class="login_form">
+                    <div class="form-group">
+                        <label for="signup_username">Username:</label>
+                        <input type="text" class="form-control" id="signup_username" placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup_pass">Password</label>
+                        <input type="password" class="form-control" id="signup_pass" placeholder="Password">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup_mail">E-mail</label>
+                        <input type="password" class="form-control" id="signup_mail" placeholder="E-mail">
+                    </div>
+                      <button type="button" class="btn btn-secondary" onclick="signup.bl.signup_user();">Sign Up</button>
+                </form>
+            
+            </main>
+
+
+
+            <footer class="mastfoot mt-auto">
+            <div class="inner">
+                
+            </div>
+            </footer>
+
+        </div>
+
+    </body>
+
+
+    <script>
+        let signup = {}
+
+        signup.bl = new function() {
+
+            this.signup_user = async () => {
+
+                //let body = {};
+
+                let username = signup_username.value;
+                let password = signup_pass.value;
+                let email = signup_mail.value;
+                let date = new Date();
+                date = date.toISOString();
+
+                let url = "/api/users/register?username=" + username + "&password=" + password + "&email=" + email + "&date=" + date;
+
+                let res = await js.api.get(url);
+                debugger;
+                if(res.status == 200)
+                {
+                    let data = await res.json();
+                    let id = data[0]["id"];
+                    let username = data[0]["username"];
+                    console.log(id);
+                    sessionStorage.setItem("user_id", id);
+                    sessionStorage.setItem("username", username);
+                    window.location.href = "/home";
+                } 
+                else 
+                {
+                    alert("Wrong login data!");
+                }
+
+            }
+        
+        }
+    </script>
+
+
+</html>

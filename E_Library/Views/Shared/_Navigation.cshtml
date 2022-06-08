@@ -1,0 +1,44 @@
+﻿
+<header class="mb-auto" onload="focus_default();">
+    <div class="inner d-flex justify-content-around flex-md-wrap" id="nav_div">
+        <h3 class="d-block" style="flex: 0 0 50%">eLibrary</h3>
+        <nav class="nav justify-content-around" style="flex: 0 0 50%">
+            <ul class="no-bullets d-flex justify-content-center">
+                
+                <li><a class="nav-link" href="/home/index" id="home_btn" onclick="focus_default(this);">Home</a></li>
+                <li><a class="nav-link" href="/graph/allbooks" id="graphql_btn" onclick="focus_default(this);">GraphQL</a></li>
+                <li><a class="nav-link" href="/rest/allbooks" id="rest_btn" onclick="focus_default(this);">REST API</a></li>
+                <li><a class="nav-link" href="/home/user" id="user_btn" onclick="focus_default(this);">User</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<script>
+
+    function focus_default() {
+
+        home_btn.classList.remove("active");
+        graphql_btn.classList.remove("active");
+        rest_btn.classList.remove("active");
+
+        if(window.location.href.includes("rest")) {
+            rest_btn.classList.add("active");
+        } 
+        else if(window.location.href.includes("graph")) {
+            graphql_btn.classList.add("active");
+        }
+        else if(window.location.href.includes("user")) {
+            user_btn.classList.add("active");
+        }
+        else {
+            home_btn.classList.add("active");
+        }
+
+    }
+
+    window.onload = function() {
+        focus_default();
+    }
+
+</script>

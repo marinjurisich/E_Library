@@ -1,0 +1,150 @@
+﻿header {
+    color: #fff;
+}
+
+body{ 
+    color:black!important;
+}
+
+.background_image {
+    background-image: url("https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&q=1080");
+    filter: brightness(25%);
+    background-size: cover;
+    display: block;
+    height: 1080px;
+    left: 0;
+    position: fixed;
+    right: 0;
+    z-index: -2;
+}
+
+.border_white {
+   border: 1px solid white;
+}
+
+
+
+ul.no-bullets {
+    list-style-type: none; /* Remove bullets */
+    padding: 0; /* Remove padding */
+    margin: 0; /* Remove margins */
+}
+
+a,
+a:focus,
+a:hover {
+    color: #fff;
+}
+
+
+
+.nav-link {
+    
+    color: #fff; /* IE8 proofing */
+    color: rgba(255,255,255,.75);
+    border-bottom: 2px solid transparent;
+}
+
+.nav-link:hover {
+    color: #a9a9a9;
+    background-color: transparent;
+    border-bottom-color: #a9a9a9;
+    border-bottom-color: rgba(255,255,255,.25);
+}
+
+.nav-link:active, .nav-link:focus {
+    color: #fff;
+    border-bottom-color: #fff;  
+}
+
+.active {
+    color: #fff;
+    border-bottom-color: #fff;
+}
+
+
+
+.blur {
+    filter: blur(5px) grayscale(0.2) brightness(25%);
+}
+
+
+.wrapper {
+    background-image: none;
+    background-color: white;
+    color: black!important;
+    z-index: 2;
+    border-radius:0.5rem;
+    width:75%;
+    margin: 0 auto;
+    border: 1px solid silver;
+    padding-bottom: 3rem;
+}
+
+.login_form {
+    margin: 0 auto;
+    width: 25%;
+    display:block;
+    background-color:whitesmoke;
+    border: 1px solid silver;
+    border-radius:0.5rem;
+    color:black;
+    padding:3rem;
+}
+
+.book_row:hover {
+    background-color: #6c757d1b;
+    transition: ease-in 0.2s;
+    cursor: pointer;
+}
+
+
+@media only screen and (max-width: 600px) {
+    #nav_div {
+        flex-direction: column !important;
+    }
+
+    .login_form {
+        margin: 0 auto;
+        width: 75%;
+        display: block;
+        background-color: whitesmoke;
+        border: 1px solid silver;
+        border-radius: 0.5rem;
+        color: black;
+        padding: 3rem;
+    }
+
+}
+
+@media only screen and (max-width: 1000px) {
+
+    .login_form {
+        margin: 0 auto;
+        width: 50%;
+        display: block;
+        background-color: whitesmoke;
+        border: 1px solid silver;
+        border-radius: 0.5rem;
+        color: black;
+        padding: 3rem;
+    }
+
+}
+
+@media only screen and (max-width: 600px) {
+    #nav_div {
+        flex-direction: column !important;
+    }
+
+    .login_form {
+        margin: 0 auto;
+        width: 75%;
+        display: block;
+        background-color: whitesmoke;
+        border: 1px solid silver;
+        border-radius: 0.5rem;
+        color: black;
+        padding: 3rem;
+    }
+}
