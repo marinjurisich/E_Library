@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HotChocolate.AspNetCore.Authorization;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace E_Library.Models {
@@ -21,6 +22,8 @@ namespace E_Library.Models {
         [ForeignKey("Author")]
         public int? AuthorId { get; set; }
         public Author? Author { get; set; }
+
+        [Authorize(Roles =new [] {"admin"})]
         public virtual Loan? Loan { get; set; }
 
     }
