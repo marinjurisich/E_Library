@@ -23,8 +23,8 @@ namespace E_Library.Models {
         public int? AuthorId { get; set; }
         public Author? Author { get; set; }
 
-        [Authorize(Roles =new [] {"admin"})]
-        public virtual Loan? Loan { get; set; }
+        //[Authorize(Roles =new [] {"admin"})]
+        public Loan? Loan { get; set; }
 
     }
 }

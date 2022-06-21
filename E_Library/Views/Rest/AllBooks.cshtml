@@ -69,7 +69,7 @@
 
             let data = await js.api.get_json(url);
 
-            console.log(data)
+            console.log("DATA",data)
 
             let html = books_table_body.innerHTML;
 
@@ -82,13 +82,13 @@
                 var t = books_row_template.innerHTML;
                 i++;
 
-                t = t.replace("${id}", d['id']);
+                t = t.replace("${id}", d['Id']);
                 t = t.replace("${i}", i);
-                t = t.replace("${title}", d['title']);
-                t = t.replace("${author_id}", d['authorId']);
-                t = t.replace("${name}", d['name']);
-                t = t.replace("${year}", d['year']);
-                t = t.replace("${isbn}", d['isbn']);
+                t = t.replace("${title}", d['Title']);
+                t = t.replaceAll("${author_id}", ['AuthorId']);
+                t = t.replace("${name}", d['Author_name']);
+                t = t.replace("${year}", d['Year']);
+                t = t.replace("${isbn}", d['Isbn']);
 
                 books_table_body.insertAdjacentHTML("beforeend", t);
 

@@ -1,9 +1,12 @@
+using E_Library.ControllersApi;
 using E_Library.Data;
 using E_Library.GraphQL;
+using HotChocolate.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,11 +41,30 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     ValidIssuer = "https://localhost:5000",
                     ValidAudience = "https://localhost:5000",
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = signingKey
+                    IssuerSigningKey = signingKey,
                 };
         });
-  
+
+//builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddScoped<UsersController>();
+builder.Services.AddScoped<Query>();
+
+builder.Services.AddDbContext<LibraryContext>(opt => opt.UseSqlServer("Server=DESKTOP-SH6HTAN;Database=library;Trusted_Connection=True;"));
+
+
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromSeconds(1000);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 builder.Services.AddAuthorization();
+
+
 
 //GraphQl services
 
@@ -63,7 +85,8 @@ builder.Services
     .AddAuthorization()
     .AddProjections()
     .AddFiltering()
-    .AddSorting();
+    .AddSorting()
+    .AddHttpRequestInterceptor<HttpRequestInterceptor>(); ;
 
 
 
@@ -82,8 +105,9 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
-app.UseAuthorization(); 
+app.UseAuthorization();
 
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

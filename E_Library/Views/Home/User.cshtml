@@ -211,14 +211,14 @@
                 var t = books_row_template_rest.innerHTML;
                 i++;
 
-                t = t.replaceAll("${id}", d['id']);
-                t = t.replaceAll("${book_id}", d['book_id']);
+                t = t.replaceAll("${id}", d['Id']);
+                t = t.replaceAll("${book_id}", d['Book_id']);
                 t = t.replace("${i}", i);
-                t = t.replace("${title}", d['title']);
-                t = t.replace("${author_id}", d['authorId']);
-                t = t.replace("${name}", d['name']);
-                t = t.replace("${year}", d['year']);
-                t = t.replace("${isbn}", d['isbn']);
+                t = t.replace("${title}", d['Title']);
+                t = t.replace("${author_id}", d['AuthorId']);
+                t = t.replace("${name}", d['Name']);
+                t = t.replace("${year}", d['Year']);
+                t = t.replace("${isbn}", d['Isbn']);
 
                 books_table_body.insertAdjacentHTML("beforeend", t);
 

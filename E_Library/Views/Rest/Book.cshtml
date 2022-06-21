@@ -140,16 +140,18 @@
 
             let data = await js.api.get_json(url);
 
-            book_title.innerText = data[0]['title'];
-            book_author.innerText = data[0]['name'];
+            console.log(data);
 
-            book_isbn.value = data[0]['isbn'];
-            book_year.value = data[0]['year'];
-            book_copies.value = data[0]['number_of_copies'];
-            book_price.value = data[0]['price'];
-            book_call_number.value = data[0]['item_call_number'];
-            book_publisher.value = data[0]['publisher_code'];
-            book_edition.innerText = data[0]['edition_statement'];
+            book_title.innerText = data[0]['Title'];
+            book_author.innerText = data[0]['Name'];
+
+            book_isbn.value = data[0]['Isbn'];
+            book_year.value = data[0]['Year'];
+            book_copies.value = data[0]['Number_of_copies'];
+            book_price.value = data[0]['Price'];
+            book_call_number.value = data[0]['Item_call_number'];
+            book_publisher.value = data[0]['Publisher_code'];
+            book_edition.innerText = data[0]['Edition_statement'];
 
         }
 

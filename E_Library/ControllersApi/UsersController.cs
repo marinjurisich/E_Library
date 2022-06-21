@@ -1,4 +1,5 @@
 ﻿using E_Library.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 
@@ -7,6 +8,13 @@ namespace E_Library.ControllersApi {
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class UsersController : ControllerBase {
+
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ISession _session;
+        public UsersController(IHttpContextAccessor httpContextAccessor) {
+            _httpContextAccessor = httpContextAccessor;
+            _session = _httpContextAccessor.HttpContext.Session;
+        }
 
 
         public object login(string username, string password) {
@@ -22,7 +30,9 @@ namespace E_Library.ControllersApi {
             var usrname = row.Field<string>("username");
             User u = new User(id, usrname, role);
 
-           var token = GraphQL.Query.GetJWTAuthKey(u);
+            _session.SetInt32("userid", id);
+            Console.WriteLine(_session.GetInt32("userid"));
+            var token = GraphQL.Query.GetJWTAuthKey(u);
 
             user.Columns.Add("token", typeof(string));
 
